@@ -19,7 +19,8 @@ public class IndexerThreading {
         ArrayList<Thread> T = new ArrayList<>();
 
         // Stemmer and indexer
-        String[] modes = { "Stemmer", "Indexer" };
+        // String[] modes = { "Stemmer", "Indexer" };
+        String[] modes = { "Indexer" };
         for (String mode : modes) {
             // make a new array of threads
             T = new ArrayList<>();
@@ -42,7 +43,7 @@ public class IndexerThreading {
                 else if (mode == "Indexer") {
                     // ? should we delete this line and / or use syncronize()?
                     db = new theDataBase();
-                    T.add(new Thread(new Indexer(files, start, end, db)));
+                    T.add(new Thread(new Indexer(files, start, end, db, i)));
                 }
             }
 

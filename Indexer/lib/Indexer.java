@@ -9,12 +9,15 @@ public class Indexer implements Runnable {
     ArrayList<String> Docs;
     theDataBase db;
     int start, end;
+    int myThreadNumber;
 
-    public Indexer(ArrayList<String> Docs, int start, int end, theDataBase db) {
+    public Indexer(ArrayList<String> Docs, int start, int end, theDataBase db, int threadNumber) {
         this.Docs = Docs;
         this.start = start;
         this.end = end;
         this.db = db;
+        this.myThreadNumber = threadNumber;
+        System.out.println("Thread#"+ this.myThreadNumber+" will be working on files from "+this.start+" to "+this.end);
     }
 
     // TODO| identify each word whether it's h1, h2, h3, p, div, etc. and put its
@@ -22,30 +25,41 @@ public class Indexer implements Runnable {
     @Override
     public void run() {
         for (int i = this.start; i < this.end; i++) {
-            // read the output of the stemmer
-            ReadFile rFile = new ReadFile(Constants.stemmedDir + this.Docs.get(i));
-            // indx of words
-            Integer indx = 0;
-            // array of lines
-            String[] lines = rFile.file.split("\n");
+            int starting_i = i;
             ArrayList<String> fileTerms = new ArrayList<>();
             ArrayList<Integer> takenWordsIndecies = new ArrayList<>();
-            // array of words
-            for (int j = 0; j < lines.length; j++) {
-                String[] terms = lines[j].split(" ");
-                for (int k = 0; k < terms.length; k++) {
-                    String ok = FilterString.termOk(terms[k]);
-                    if (ok != "") {
-                        fileTerms.add(ok);
-                        takenWordsIndecies.add(indx);
+            ArrayList<Integer> docNumArr = new ArrayList<>();
+            for (int w = 0; w < Constants.filesPerIndexerQuery && i < this.end; w++, i++) {
+                // read the output of the stemmer
+                ReadFile rFile = new ReadFile(Constants.stemmedDir + this.Docs.get(i));
+                // indx of words
+                Integer indx = 0;
+                // array of lines
+                String[] lines = rFile.file.split("\n");
+                // array of words
+                for (int j = 0; j < lines.length; j++) {
+                    String[] terms = lines[j].split(" ");
+                    for (int k = 0; k < terms.length; k++) {
+                        String ok = FilterString.termOk(terms[k]);
+                        if (!ok.isBlank()) {
+                            fileTerms.add(ok);
+                            takenWordsIndecies.add(indx);
+                            docNumArr.add(Integer.parseInt(this.Docs.get(i).replace(".txt", "")));
+                        }
+                        // true index in the original document
+                        indx++;
                     }
-                    // true index in the original document
-                    indx++;
                 }
             }
-
+            // will be increased next loop
+            i--;
+            System.out.println("Thread #" + myThreadNumber + " Inserting files: From " + starting_i + " To " + i
+            + " Into the database");
             // insert array of words in the database & remove .txt from its name
-            db.insertIndexedFile(fileTerms,takenWordsIndecies, Integer.parseInt(this.Docs.get(i).replace(".txt", "")), 0);
+            db.insertIndexedFile(fileTerms, takenWordsIndecies, docNumArr, 0);
+            // TODO syncronize NFILES
+            // TODO delete this
+            System.out.println("Thread #" + myThreadNumber + " Files Done: From " + starting_i + " To " + i);
         }
     }
 
@@ -53,7 +67,7 @@ public class Indexer implements Runnable {
         ArrayList<String> files = new ArrayList<>();
         files.add("Files/in2.txt");
         theDataBase db = new theDataBase();
-        Thread t1 = new Thread(new Indexer(files, 0, 1, db));
+        Thread t1 = new Thread(new Indexer(files, 0, 1, db, 0));
         t1.start();
         try {
             t1.join();

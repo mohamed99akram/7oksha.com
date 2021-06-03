@@ -10,7 +10,7 @@ public class ReadFile {
     // the whole file is stored here
     public String file;
 
-    ReadFile(String path) {
+    public ReadFile(String path) {
         file = new String();
         try {
             String currentLine = null;

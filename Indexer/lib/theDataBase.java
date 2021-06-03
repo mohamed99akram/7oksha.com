@@ -78,6 +78,28 @@ public class theDataBase {
         }
     }
 
+    public void insertIndexedFile(ArrayList<String> words, ArrayList<Integer> indecies, ArrayList<Integer>DocNum, int priorities) {
+        for (int i = 0; i < words.size(); i++) {
+            // initial statement
+            String query = new String("INSERT INTO INDEXER (term,docnum,indx,wordrank) VALUES('" + words.get(i) + "', "
+                    + (DocNum.get(i)) + ", " + (indecies.get(i)) + ", " + (priorities) + ")");
+            i++;
+            // add Constants.rowsPerQuery statements
+            for (int j = 1; j < Constants.rowsPerQuery && i < words.size(); i++, j++) {
+                query += ",('" + words.get(i) + "', " + (DocNum.get(i)) + ", " + (indecies.get(i)) + ", " + (priorities) + ")";
+            }
+            i--;// will be increased again next loop
+            query += ";";
+            // execute all of them
+            try {
+                theStatement.execute(query);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+    }
+
+    // ! old function you may want to delete it
     public void insertIndexedFile(ArrayList<String> words, ArrayList<Integer> indecies, int DocNum, int priorities) {
         for (int i = 0; i < words.size(); i++) {
             // initial statement
@@ -157,6 +179,26 @@ public class theDataBase {
             System.out.println("Error selecting HASH_VALUE");
         }
         return result;
+    }
+    public void insertFoundSites(ArrayList<String> URL,ArrayList<Integer> hashCode){
+        for (int i = 0; i < URL.size(); i++) {
+            // initial statement
+            String query = new String("INSERT INTO FOUNDSITES (URL,HASH_VALUE) VALUES('" + URL.get(i) + "', "
+                    + (hashCode.get(i)) + ")");
+            i++;
+            // add Constants.rowsPerQuery statements
+            for (int j = 1; j < Constants.rowsPerQuery && i < URL.size(); i++, j++) {
+                query += ",('" + URL.get(i) + "', " + (hashCode.get(i)) + ")";
+            }
+            i--;// will be increased again next loop
+            query += ";";
+            // execute all of them
+            try {
+                theStatement.execute(query);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
     }
     public static void main(String[] args) {
         theDataBase db = new theDataBase();

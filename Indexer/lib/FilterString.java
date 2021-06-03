@@ -11,7 +11,8 @@ public class FilterString {
             return "";
         }
         // Only Alphabetic or numeral
-        finalTerm = finalTerm.replaceAll("[^a-zA-Z0-9]", ""); // #https://www.geeksforgeeks.org/how-to-remove-all-non-alphanumeric-characters-from-a-string-in-java/
+        // TODO change allowed letter?
+        finalTerm = finalTerm.replaceAll("[^a-zA-Z]", ""); // #https://www.geeksforgeeks.org/how-to-remove-all-non-alphanumeric-characters-from-a-string-in-java/
         return finalTerm;
     }
 
