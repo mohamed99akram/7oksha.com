@@ -5,7 +5,8 @@ package lib;
 import java.util.ArrayList;
 
 public class IndexerThreading {
-    // * if #files< #threads, #threads is modified to be = #files (each thread works on a file in this case)
+    // * if #files< #threads, #threads is modified to be = #files (each thread works
+    // on a file in this case)
     static int NThreads = Constants.NThreads;
 
     public static void goIndexer() {
@@ -20,7 +21,7 @@ public class IndexerThreading {
 
         // Stemmer and indexer
         // String[] modes = { "Stemmer", "Indexer" };
-        String[] modes = { "Indexer" };
+        String[] modes = { "Indexer", "DBInsertion" };
         for (String mode : modes) {
             // make a new array of threads
             T = new ArrayList<>();
@@ -44,6 +45,12 @@ public class IndexerThreading {
                     // ? should we delete this line and / or use syncronize()?
                     db = new theDataBase();
                     T.add(new Thread(new Indexer(files, start, end, db, i)));
+                }
+
+                // Insert into the database
+                else if (mode == "DBInsertion") {
+                    System.out.println("*****DBInsertion started********");
+                    T.add(new Thread(new IndexerDBInserter(Constants.indexerPaths[i])));
                 }
             }
 

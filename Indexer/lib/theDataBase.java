@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
 // ! DON'T FORGET:
@@ -78,7 +79,35 @@ public class theDataBase {
         }
     }
 
-    public void insertIndexedFile(ArrayList<String> words, ArrayList<Integer> indecies, ArrayList<Integer>DocNum, int priorities) {
+    public void insertRow(String values) {
+        // TODO This should be modified to be the fastest possible version
+        try {
+            ps = theConnection.prepareStatement("INSERT INTO INDEXER VALUES " + values);
+            ps.execute();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void insertIndexedFilePrepared(ArrayList<String> words, ArrayList<Integer> indecies,
+            ArrayList<Integer> DocNum, int priorities) {
+        try {
+            ps = theConnection.prepareStatement("INSERT INTO INDEXER (term,docnum,indx,wordrank) VALUES(?,?,?,?)");
+            for (int i = 0; i < words.size(); i++) {
+                ps.setString(1, "'" + words.get(i) + "'");
+                ps.setString(2, DocNum.get(i).toString());
+                ps.setString(3, indecies.get(i).toString());
+                ps.setString(4, Integer.toString(priorities));
+                ps.addBatch();
+            }
+            ps.execute();
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    public void insertIndexedFile(ArrayList<String> words, ArrayList<Integer> indecies, ArrayList<Integer> DocNum,
+            int priorities) {
         for (int i = 0; i < words.size(); i++) {
             // initial statement
             String query = new String("INSERT INTO INDEXER (term,docnum,indx,wordrank) VALUES('" + words.get(i) + "', "
@@ -86,7 +115,8 @@ public class theDataBase {
             i++;
             // add Constants.rowsPerQuery statements
             for (int j = 1; j < Constants.rowsPerQuery && i < words.size(); i++, j++) {
-                query += ",('" + words.get(i) + "', " + (DocNum.get(i)) + ", " + (indecies.get(i)) + ", " + (priorities) + ")";
+                query += ",('" + words.get(i) + "', " + (DocNum.get(i)) + ", " + (indecies.get(i)) + ", " + (priorities)
+                        + ")";
             }
             i--;// will be increased again next loop
             query += ";";
@@ -156,35 +186,36 @@ public class theDataBase {
         }
         return 0;
     }
-    
+
     // TODO stem the coming word or send it stemmed
     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$
     // return array of document hashes
     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-    public ArrayList<Integer> searchFor(String term){
+    public ArrayList<Integer> searchFor(String term) {
         term = FilterString.termOk(term);
-        if(term == ""){
+        if (term == "") {
             return null;
         }
         ArrayList<Integer> result = null;
         try {
             // $ IMPORTANT SQL QUERY
-            ps = theConnection.prepareStatement("SELECT DOCNUM FROM INDEXER WHERE term = '"+term+"';");
+            ps = theConnection.prepareStatement("SELECT DOCNUM FROM INDEXER WHERE term = '" + term + "';");
             rs = ps.executeQuery();
             result = new ArrayList<>();
             while (rs.next()) {
-                result.add(Integer.parseInt(rs.getString(1)) );
+                result.add(Integer.parseInt(rs.getString(1)));
             }
         } catch (Exception e) {
             System.out.println("Error selecting HASH_VALUE");
         }
         return result;
     }
-    public void insertFoundSites(ArrayList<String> URL,ArrayList<Integer> hashCode){
+
+    public void insertFoundSites(ArrayList<String> URL, ArrayList<Integer> hashCode) {
         for (int i = 0; i < URL.size(); i++) {
             // initial statement
-            String query = new String("INSERT INTO FOUNDSITES (URL,HASH_VALUE) VALUES('" + URL.get(i) + "', "
-                    + (hashCode.get(i)) + ")");
+            String query = new String(
+                    "INSERT INTO FOUNDSITES (URL,HASH_VALUE) VALUES('" + URL.get(i) + "', " + (hashCode.get(i)) + ")");
             i++;
             // add Constants.rowsPerQuery statements
             for (int j = 1; j < Constants.rowsPerQuery && i < URL.size(); i++, j++) {
@@ -200,6 +231,7 @@ public class theDataBase {
             }
         }
     }
+
     public static void main(String[] args) {
         theDataBase db = new theDataBase();
         db.insertWord("hello", 1, 1, 1);

@@ -10,13 +10,14 @@ public class Indexer implements Runnable {
     theDataBase db;
     int start, end;
     int myThreadNumber;
-
+    ArrayList<String> paths;
     public Indexer(ArrayList<String> Docs, int start, int end, theDataBase db, int threadNumber) {
         this.Docs = Docs;
         this.start = start;
         this.end = end;
         this.db = db;
         this.myThreadNumber = threadNumber;
+        paths = Constants.indexerPaths[this.myThreadNumber];
         System.out.println("Thread#"+ this.myThreadNumber+" will be working on files from "+this.start+" to "+this.end);
     }
 
@@ -54,12 +55,22 @@ public class Indexer implements Runnable {
             // will be increased next loop
             i--;
             System.out.println("Thread #" + myThreadNumber + " Inserting files: From " + starting_i + " To " + i
-            + " Into the database");
+            + " Into the file system");
+
+
+            // File path
+            String pathToRows = "thread#"+this.myThreadNumber+"_From_"+starting_i+"_to_"+i+".txt";
+            paths.add(pathToRows);
+            //Inserting to file system
+            IndexerFiled indxFiled = new IndexerFiled(fileTerms,docNumArr,takenWordsIndecies,0);
+            indxFiled.insertDataInto(pathToRows);
             // insert array of words in the database & remove .txt from its name
-            db.insertIndexedFile(fileTerms, takenWordsIndecies, docNumArr, 0);
+            // db.insertIndexedFile(fileTerms, takenWordsIndecies, docNumArr, 0);
             // TODO syncronize NFILES
+            System.out.println("Total Files done = "+ Constants.NFILES);
+            Constants.NFILES+=i-starting_i+1;
             // TODO delete this
-            System.out.println("Thread #" + myThreadNumber + " Files Done: From " + starting_i + " To " + i);
+            System.out.println("Thread #" + myThreadNumber + " Filesystem.Files Done: From " + starting_i + " To " + i);
         }
     }
 
