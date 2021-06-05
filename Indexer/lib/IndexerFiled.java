@@ -20,6 +20,6 @@ public class IndexerFiled {
         for (int i = 0; i < words.size(); i++) {
             data+="('" + words.get(i)+"', "+docNum.get(i)+", "+indecies.get(i)+", "+priority+")\n";
         }
-       new OutputFile(path, data);
+       new OutputFile(Constants.IndexerOutput+path, data);
     }
 }

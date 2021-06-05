@@ -69,6 +69,11 @@ public class Indexer implements Runnable {
             // TODO syncronize NFILES
             System.out.println("Total Files done = "+ Constants.NFILES);
             Constants.NFILES+=i-starting_i+1;
+            // insert into the allQueries string array
+            // ? will this be deleted?
+            for (int j = 0; j < fileTerms.size(); j++) {
+                Constants.allQueries[this.myThreadNumber]+="('" + fileTerms.get(j)+"', "+docNumArr.get(j)+", "+takenWordsIndecies.get(j)+", "+0+"),\n";
+            }
             // TODO delete this
             System.out.println("Thread #" + myThreadNumber + " Filesystem.Files Done: From " + starting_i + " To " + i);
         }

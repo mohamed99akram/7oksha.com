@@ -21,7 +21,7 @@ public class IndexerThreading {
 
         // Stemmer and indexer
         // String[] modes = { "Stemmer", "Indexer" };
-        String[] modes = { "Indexer", "DBInsertion" };
+        String[] modes = { "Indexer" };
         for (String mode : modes) {
             // make a new array of threads
             T = new ArrayList<>();

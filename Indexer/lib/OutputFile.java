@@ -7,7 +7,7 @@ import java.io.IOException;
 // Just to make repeated tasks easier
 // use new OutputFile(path,data)
 public class OutputFile {
-    OutputFile(String path, String data) {
+    public OutputFile(String path, String data) {
         FileWriter fw;
         try {
             fw = new FileWriter(path);

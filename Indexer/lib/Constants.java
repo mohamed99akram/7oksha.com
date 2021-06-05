@@ -17,10 +17,11 @@ public class Constants {
     // Number of files made
     public static int NFILES = 0;
     // Number of files per Indexer query
-    public static final int filesPerIndexerQuery = 5;
+    public static final int filesPerIndexerQuery = 100;
     // Paths coming out of indexer
     public static ArrayList<String>[] indexerPaths;
-
+    // All queries
+    public static String allQueries[] = new String[NThreads];
     //initialize pahts
     public static void initialize(){
         indexerPaths = new ArrayList[NThreads];
